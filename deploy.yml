@@ -1,0 +1,45 @@
+---
+- name : "apache installation with docker"
+  hosts : prod
+  become: true
+  # become_user: root
+  pre_tasks: 
+  #- name: check permission
+    #ansible.builtin.file:
+      #path: /tmp/
+      #owner: "vagrant"
+      #group: "vagrant"
+      #mode: '0777'
+  - name: create docker epository
+    ansible.builtin.yum_repository:
+      name: docker
+      description: dokcer-repo
+      file: /etc/yum.repos.d/docker
+      baseurl: https://download.docker.com/linux/centos/7/x86_64/stable
+      gpgcheck: no 
+  - name: install docker 
+    package: 
+      name: docker-ce
+      state: latest
+    become: yes
+  - name: donwload pip script
+    get_url:
+      url: https://bootstrap.pypa.io/pip/2.7/get-pip.py
+      dest: /tmp/get-pip.py
+  - name: install python pip
+    command: python2.7 /tmp/get-pip.py
+  - name: Install docker python
+    pip: 
+      name: docker-py
+  - name : start docker service
+    service: 
+      name: "docker"
+      state: started
+      enabled: yes
+  tasks:
+  - name: Create Apache container
+    docker_container:
+      name: webapp
+      image: httpd
+      ports:
+       - "80:80"

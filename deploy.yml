@@ -2,6 +2,8 @@
 - name : "apache installation with docker"
   hosts : prod
   become: true
+  vars_files:
+    - files/secrets/credentials.yml
   # become_user: root
   pre_tasks: 
   - name: install packages

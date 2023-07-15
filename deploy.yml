@@ -4,6 +4,15 @@
   become: true
   # become_user: root
   pre_tasks: 
+  - name: install packages
+    package: 
+      name: '{{ item }}'
+      state: present
+    when: ansible_distribution == "CentOS"
+    loop:
+      - epel-release
+      - wget
+      - git
   #- name: check permission
     #ansible.builtin.file:
       #path: /tmp/
@@ -37,9 +46,15 @@
       state: started
       enabled: yes
   tasks:
+  - name: copie website template
+    template: 
+      src: index.html.j2
+      dest: /home/vagrant/index.html
   - name: Create Apache container
     docker_container:
       name: webapp
       image: httpd
       ports:
        - "80:80"
+      volumes: 
+       - /home/vagrant/index.html:/usr/local/apache2/htdocs/index.html

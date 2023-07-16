@@ -1,0 +1,15 @@
+---
+- name: "wordpress installation"
+  hosts : prod
+  become: true
+  vars:
+    system_user: vagrant
+  vars_files:
+  - files/secrets/credentials.yml
+  pre_tasks:
+  - name: create www-data
+    user: 
+      name: www-data
+      state: present
+  roles:
+  - ansible-role-containerized-wordpress
